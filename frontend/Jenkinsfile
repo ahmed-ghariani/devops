@@ -9,7 +9,7 @@ pipeline {
                 dir('frontend') {
                     sh 'npm install'
                     sh 'npm run build'
-                    stash includes: 'dist/*', name: 'app'
+                    stash includes: '**/dist/*', name: 'app'
                 }
             }
         }
