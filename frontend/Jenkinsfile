@@ -15,7 +15,9 @@ pipeline {
         }
         stage('scann') {
             agent { label 'java' }
-            def scannerHome = tool 'sonarqube';
+            tools {
+                scannerHome 'sonarqube'
+            }
             steps {
                 dir('frontend') {
                     withSonarQubeEnv(installationName: 'sonarqube') {
