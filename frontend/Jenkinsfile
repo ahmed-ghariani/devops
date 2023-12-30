@@ -15,9 +15,9 @@ pipeline {
         }
         stage('scann') {
             agent { label 'java' }
+            def scannerHome = tool 'sonarqube';
             steps {
                 dir('frontend') {
-                    def scannerHome = tool 'sonarqube'
                     withSonarQubeEnv(installationName: 'sonarqube') {
                         sh "${scannerHome}/bin/sonar-scanner"
                     }
