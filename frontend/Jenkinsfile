@@ -44,11 +44,23 @@ pipeline {
                 dir('frontend') {
                     unstash 'app'
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PSW', usernameVariable: 'USER')]) {
-                        sh 'docker build -t ${USER}/front:${BUILD_NUMBER} .'
+                        sh 'docker build -t ${USER}/frontend:${BUILD_NUMBER} .'
                         sh 'echo ${PSW} | docker login -u ${USER} --password-stdin'
-                        sh 'docker push ${USER}/front:${BUILD_NUMBER}'
+                        sh 'docker push ${USER}/frontend:${BUILD_NUMBER}'
                     }
                 }
+            }
+        }
+        stage('deploy') {
+            agent any
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PSW', usernameVariable: 'USER')]) {
+                    sh 'echo ${PSW} | docker login -u ${USER} --password-stdin'
+                    sh 'docker pull ${USER}/frontend:${BUILD_NUMBER}'
+                    sh 'docker tag ${USER}/frontend:${BUILD_NUMBER} frontend:latest'
+                }  
+                sh 'docker compose version'
+                sh 'docker images'
             }
         }
     }

@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: frontent:latest
+    environment:
+      BACKEND_URL: 'http://backend:8080'
+    ports:
+      - 8080:80
+  
+  backend:
+    image: backend:latest
+    expose:
+      8080
+    depends_on:
+      - db
+    
+  db:
+    image: postres: 
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+
+volumes:
+  postgresql:
+  postgres_data:
