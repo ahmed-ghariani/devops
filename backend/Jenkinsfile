@@ -1,0 +1,55 @@
+pipeline {
+    agent {
+        docker {
+            image 'maven:3.8.8-eclipse-temurin-17-alpine'
+            args '-v $HOME/.m2:/root/.m2'
+        }
+    }
+    stages {
+        stage('Scan') {
+            steps {
+                dir('backend') {
+                    withSonarQubeEnv(installationName: 'sonarqube') {
+                        sh './mvnw clean package org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar -Dmaven.test.skip'
+                        stash includes: 'target/*.jar', name: 'app'
+                    }
+                }
+            }
+        }
+        stage('publish on nexus') {
+            steps {
+                dir('backend') {
+                    unstash 'app'
+                    sh 'mv target/backend-0.0.1.jar backend-0.0.${BUILD_NUMBER}.jar'
+                    nexusArtifactUploader(
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    nexusUrl: 'nexus:8081',
+                    credentialsId: 'nexus',
+                    repository: 'builds',
+                    groupId: 'devops',
+                    version: '0.0.${BUILD_NUMBER}',
+                    artifacts: [
+                        [artifactId: 'backend',
+                        classifier: '',
+                         file: 'backend-0.0.${BUILD_NUMBER}.jar',
+                         type: 'jar']
+                    ]
+                )
+                }
+            }
+        }
+        stage('docker') {
+            steps {
+                unstash 'app'
+                dir('target') {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PSW', usernameVariable: 'USER')]) {
+                        sh 'docker build -t ${USER}/backend:${BUILD_NUMBER} -f backend/dockerfile .'
+                        sh 'echo ${PSW} | docker login -u ${USER} --password-stdin'
+                        sh 'docker push ${USER}/backend:${BUILD_NUMBER}'
+                    }
+                }
+            }
+        }
+    }
+}
