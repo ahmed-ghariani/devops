@@ -26,4 +26,4 @@ services:
 
 volumes:
   postgresql:
-  postgres_data:
+  postgresql_data:
