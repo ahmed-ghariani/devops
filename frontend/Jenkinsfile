@@ -26,13 +26,15 @@ pipeline {
                 }
             }
         }
-        stage('publish'){
+        stage('publish') {
             agent {
                 docker { image 'node:18.19.0-alpine3.19' }
             }
-            steps{
-                withCredentials([string(credentialsId: 'npm_token', variable: 'NEXUS_SECRET')]) {
-                    sh 'npm publish'
+            steps {
+                dir('frontend') {
+                    withCredentials([string(credentialsId: 'npm_token', variable: 'NEXUS_SECRET')]) {
+                        sh 'npm publish'
+                    }
                 }
             }
         }
