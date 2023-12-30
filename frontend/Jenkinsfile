@@ -9,7 +9,7 @@ pipeline {
                 dir('frontend') {
                     sh 'npm install'
                     withSonarQubeEnv(installationName: 'sonarqube') {
-                        sh 'npm run sonar-scanner'
+                        sh 'npm sonar'
                     }
                     sh 'npm build'
                     stash includes: '**/dist/*', name: 'app'
