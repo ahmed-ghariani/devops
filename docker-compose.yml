@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   frontend:
-    image: frontent:latest
+    image: frontend:latest
     environment:
       BACKEND_URL: 'http://backend:8080'
     ports:
@@ -10,13 +10,15 @@ services:
   
   backend:
     image: backend:latest
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://db:5432/postgres'
     expose:
       - "8080"
     depends_on:
       - db
     
   db:
-    image: postres:latest
+    image: postgres:latest
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
