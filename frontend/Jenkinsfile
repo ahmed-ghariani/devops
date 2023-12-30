@@ -44,9 +44,9 @@ pipeline {
                 dir('frontend') {
                     unstash 'app'
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PSW', usernameVariable: 'USER')]) {
-                        sh 'docker build -t ${USER}/backend:${BUILD_NUMBER} .'
+                        sh 'docker build -t ${USER}/front:${BUILD_NUMBER} .'
                         sh 'echo ${PSW} | docker login -u ${USER} --password-stdin'
-                        sh 'docker push ${USER}/backend:${BUILD_NUMBER}'
+                        sh 'docker push ${USER}/front:${BUILD_NUMBER}'
                     }
                 }
             }
