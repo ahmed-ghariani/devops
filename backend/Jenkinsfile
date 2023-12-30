@@ -44,10 +44,11 @@ pipeline {
         stage('docker') {
             agent any
             steps {
-                unstash 'app'
-                dir('target') {
+                dir('backend') {
+                    unstash 'app'
+                    sh 'mv target/backend-0.0.1.jar backend-0.0.${BUILD_NUMBER}.jar'
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PSW', usernameVariable: 'USER')]) {
-                        sh 'docker build -t ${USER}/backend:${BUILD_NUMBER} -f backend/dockerfile .'
+                        sh 'docker build -t ${USER}/backend:${BUILD_NUMBER} .'
                         sh 'echo ${PSW} | docker login -u ${USER} --password-stdin'
                         sh 'docker push ${USER}/backend:${BUILD_NUMBER}'
                     }
