@@ -57,5 +57,16 @@ pipeline {
                 }
             }
         }
+        stage('deploy') {
+            agent any
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PSW', usernameVariable: 'USER')]) {
+                    sh 'echo ${PSW} | docker login -u ${USER} --password-stdin'
+                    sh 'docker pull ${USER}/backend:${BUILD_NUMBER}'
+                    sh 'docker tag ${USER}/backend:${BUILD_NUMBER} backend:latest'
+                }  
+                sh 'docker compose up -d backend'
+            }
+        }
     }
 }
