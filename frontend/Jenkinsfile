@@ -59,8 +59,7 @@ pipeline {
                     sh 'docker pull ${USER}/frontend:${BUILD_NUMBER}'
                     sh 'docker tag ${USER}/frontend:${BUILD_NUMBER} frontend:latest'
                 }  
-                sh 'docker compose version'
-                sh 'docker images'
+                sh 'docker compose up -d frontend'
             }
         }
     }
