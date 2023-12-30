@@ -1,0 +1,15 @@
+pipeline {
+    agent none
+    stages {
+        stage('Build') {
+            agent {
+                docker { image 'node:18.19.0-alpine3.19' }
+            }
+            steps {
+                dir('frontend'){
+                    sh 'npm install'
+                }
+            }
+        }
+    }
+}
