@@ -10,7 +10,7 @@ pipeline {
             steps {
                 dir('backend') {
                     withSonarQubeEnv(installationName: 'sonarqube') {
-                        sh './mvnw clean package org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar -Dmaven.test.skip'
+                        sh 'mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar -Dmaven.test.skip'
                         stash includes: 'target/*.jar', name: 'app'
                     }
                 }
