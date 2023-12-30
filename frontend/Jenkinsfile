@@ -1,13 +1,18 @@
 pipeline {
     agent none
     stages {
-        stage('Build') {
+        stage('Install dep scan and build') {
             agent {
                 docker { image 'node:18.19.0-alpine3.19' }
             }
             steps {
-                dir('frontend'){
+                dir('frontend') {
                     sh 'npm install'
+                    withSonarQubeEnv(installationName: 'sonarqube') {
+                        sh 'npm run sonar-scanner'
+                    }
+                    sh 'npm build'
+                    stash includes: '**/dist/*', name: 'app'
                 }
             }
         }
