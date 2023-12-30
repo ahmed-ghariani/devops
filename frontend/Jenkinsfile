@@ -41,7 +41,7 @@ pipeline {
         stage('docker') {
             agent any
             steps {
-                dir('backend') {
+                dir('frontend') {
                     unstash 'app'
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PSW', usernameVariable: 'USER')]) {
                         sh 'docker build -t ${USER}/backend:${BUILD_NUMBER} .'
