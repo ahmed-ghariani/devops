@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  nexus:
+    image: sonatype/nexus3
+    ports:
+      - 8081:8081
+    container_name: nexus
+    volumes:
+      - nexus-data:/nexus-data
+
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    privileged: true
+    user: root
+    ports:
+      - 8080:8080
+      - 50000:50000
+    container_name: jenkins
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+  agent:
+    image: myagent
+    privileged: true
+    user: root
+    container_name: agent
+    ports:
+      - 2222:22
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - agent_home:/home/jenkins
+    environment:
+      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC3/RHlWYQX119TdUCPoh8KVrm4nHXss9FTBH/LjMCLTkQdEt5BgOFGwM+zUHrPwKPw8M6W0eihQpg36mgVFCMzr2E4dqFM7mD1g6KE98JNCYdDRxx0zYISpUbXgvBhWTCo1jtNKyPYM7DqQKwex5wOl7Fba8e2+6SdPXdtZzcX0Bux3A71zXWyVa5sQlY/8jzkeO15z7FMwBb2yyDdknojtlgJVYr53uuYrzKDiaIPynA0U9oI1NNhzaUhPvmR77niXrkMiEwt62YzSF9gVWncpZk4Gn5ZJ9TWMKbKKS7rE0clJgLxFNNGWKV4Nt9qJLnUj2mYWy2fmtGxoiSJ26vzHopmKt5nhxiJuqB/5XX1/jkbMfASUGDLduJcWeoNvAIxW03yHtM49a/FJlWNnFlLPjE4OmHkU9RqOdNiBj9V6vkulNEs8+SEj3+7PpVIyYlbEGZHGqBbcxQO177yYfYwzStniqCD5nXMcReTJBq8jmV9xY03Ud7xCDJ50ttb6GU= abdullah@abdullah-Latitude-3340
+
+  sonarqube:
+    image: sonarqube:community
+    depends_on:
+      - db
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: true
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    container_name: sonarqube
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - 9000:9000
+
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    container_name: db
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:
+  postgresql_data:
+  jenkins_home:
+  nexus-data:
+  agent_home:
