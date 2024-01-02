@@ -1,0 +1,4 @@
+FROM jenkins/ssh-agent:latest-alpine3.19-jdk17
+RUN apk add --update docker-cli && apk add docker-cli-compose && apk add sudo
+
+
